@@ -1,0 +1,52 @@
+# Lager grafene over svartid én gang i døgnet.
+# Upptime-workflow, skrevet om for HPGT (README «Workflowene»): låste versjoner, miljøet «status» (bare main) og
+# GitHub-appen «HPGT Status» i stedet for et personlig token. Appens token varer én time og gjelder bare dette repoet.
+
+on:
+  schedule:
+    - cron: "23 0 * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: upptime
+  cancel-in-progress: false
+
+jobs:
+  graphs:
+    name: Grafer
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: status
+    permissions:
+      contents: read
+    steps:
+      - name: Token fra GitHub-appen «HPGT Status»
+        id: app
+        uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc # v3.4.0
+        with:
+          client-id: ${{ vars.STATUS_APP_ID }}
+          private-key: ${{ secrets.STATUS_APP_PRIVATE_KEY }}
+          # Bare det Upptime trenger: committe resultatene og lage/lukke saker. Ikke Workflows eller Actions.
+          permission-contents: write
+          permission-issues: write
+
+      # Upptime committer resultatene til main med appens token, så legitimasjonen må bli liggende i checkouten.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          token: ${{ steps.app.outputs.token }}
+          persist-credentials: true # zizmor: ignore[artipacked]
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "22"
+
+      - name: Lag grafer
+        uses: upptime/uptime-monitor@74f0683383384927e064d76a5f21f340d6af36fc # v1.46.5
+        with:
+          command: "graphs"
+        env:
+          GH_PAT: ${{ steps.app.outputs.token }}
+          SECRETS_CONTEXT: "{}"

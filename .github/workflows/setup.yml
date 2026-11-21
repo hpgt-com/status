@@ -1,0 +1,87 @@
+# Når .upptimerc.yml endres: svartider, README, grafer og statussiden på nytt. Upptimes eget «update-template»-steg
+# er tatt ut med vilje: det ville overskrevet alle filer under .github/ med Upptimes mal.
+# Upptime-workflow, skrevet om for HPGT (README «Workflowene»): låste versjoner, miljøet «status» (bare main) og
+# GitHub-appen «HPGT Status» i stedet for et personlig token. Appens token varer én time og gjelder bare dette repoet.
+
+on:
+  push:
+    branches: [main]
+    paths: [".upptimerc.yml"]
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: upptime
+  cancel-in-progress: false
+
+jobs:
+  setup:
+    name: Oppsett
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: status
+    permissions:
+      contents: read
+    steps:
+      - name: Token fra GitHub-appen «HPGT Status»
+        id: app
+        uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc # v3.4.0
+        with:
+          client-id: ${{ vars.STATUS_APP_ID }}
+          private-key: ${{ secrets.STATUS_APP_PRIVATE_KEY }}
+          # Bare det Upptime trenger: committe resultatene og lage/lukke saker. Ikke Workflows eller Actions.
+          permission-contents: write
+          permission-issues: write
+
+      # Upptime committer resultatene til main med appens token, så legitimasjonen må bli liggende i checkouten.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          token: ${{ steps.app.outputs.token }}
+          persist-credentials: true # zizmor: ignore[artipacked]
+
+      - name: Oppdater svartider
+        uses: upptime/uptime-monitor@74f0683383384927e064d76a5f21f340d6af36fc # v1.46.5
+        with:
+          command: "response-time"
+        env:
+          GH_PAT: ${{ steps.app.outputs.token }}
+          SECRETS_CONTEXT: "{}"
+
+      - name: Oppdater README
+        uses: upptime/uptime-monitor@74f0683383384927e064d76a5f21f340d6af36fc # v1.46.5
+        with:
+          command: "readme"
+        env:
+          GH_PAT: ${{ steps.app.outputs.token }}
+          SECRETS_CONTEXT: "{}"
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "22"
+
+      - name: Lag grafer
+        uses: upptime/uptime-monitor@74f0683383384927e064d76a5f21f340d6af36fc # v1.46.5
+        with:
+          command: "graphs"
+        env:
+          GH_PAT: ${{ steps.app.outputs.token }}
+          SECRETS_CONTEXT: "{}"
+
+      - name: Bygg statussiden
+        uses: upptime/uptime-monitor@74f0683383384927e064d76a5f21f340d6af36fc # v1.46.5
+        with:
+          command: "site"
+        env:
+          GH_PAT: ${{ steps.app.outputs.token }}
+          SECRETS_CONTEXT: "{}"
+
+      - name: Publiser statussiden (branchen gh-pages)
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
+        with:
+          github_token: ${{ steps.app.outputs.token }}
+          publish_dir: site/status-page/__sapper__/export/
+          force_orphan: "false"
+          user_name: hpgt-status[bot]
+          user_email: hpgt-status[bot]@users.noreply.github.com

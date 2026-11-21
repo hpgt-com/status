@@ -1,0 +1,104 @@
+# Upptime (https://upptime.js.org): sjekker sidene hvert 5. minutt fra GitHub Actions, og publiserer statussiden på
+# https://status.hpgt.com (GitHub Pages, branchen gh-pages). Går noe ned, lages en sak i dette repoet; den lukkes når det
+# er oppe igjen. Kjører hos GitHub, ikke hos Cloudflare der sidene ligger, så den virker også når Cloudflare er nede.
+# Endres med en pull request. Workflowene er våre egne (.github/workflows), ikke Upptimes mal: se README.
+owner: hpgt-com
+repo: status
+
+sites:
+  - name: hpgt.com
+    slug: hpgt-com
+    url: https://hpgt.com/
+  - name: Skjemaene på hpgt.com
+    slug: skjemaer
+    # Workeren svarer 405 på GET (skjemaene tar bare imot POST). 405 betyr altså at den kjører.
+    url: https://hpgt.com/api/radioid
+    expectedStatusCodes:
+      - 405
+  - name: flysteder.hpgt.com
+    slug: flysteder
+    url: https://flysteder.hpgt.com/
+  - name: Datatjenesten for flysteder
+    slug: datatjenesten
+    # Oppe = svarer, og melder selv at dataene er ferske («ok»: true i status.json)
+    url: https://data.hpgt.com/v1/status.json
+    __dangerous__body_down_if_text_missing: '"ok":true'
+
+status-website:
+  cname: status.hpgt.com
+  logoUrl: https://hpgt.com/assets/img/hpgt-logo.png
+  favicon: https://hpgt.com/favicon.ico
+  name: HPGT driftsstatus
+  introTitle: "Driftsstatus for hpgt.com og flysteder.hpgt.com"
+  introMessage: "Sidene sjekkes hvert 5. minutt. Sjekken kjører hos GitHub, uavhengig av Cloudflare der sidene ligger. Ser du en feil som ikke står her, kan du [melde fra](https://hpgt.com/meld-feil/)."
+  navbar:
+    - title: Status
+      href: /
+    - title: hpgt.com
+      href: https://hpgt.com/
+    - title: Flysteder
+      href: https://flysteder.hpgt.com/
+    - title: GitHub
+      href: https://github.com/$OWNER/$REPO
+  i18n:
+    activeIncidents: Pågående feil
+    allSystemsOperational: Alt virker som det skal
+    incidentReport: "Feil #$NUMBER →"
+    activeIncidentSummary: Startet $DATE, $POSTS oppdateringer
+    incidentTitle: Feil $NUMBER
+    incidentDetails: Detaljer om feilen
+    incidentFixed: Rettet
+    incidentOngoing: Pågår
+    incidentOpenedAt: Startet
+    incidentClosedAt: Rettet
+    incidentViewOnGitHub: Se og følg på GitHub
+    incidentCommentSummary: Skrevet $DATE av $AUTHOR
+    incidentBack: ← Tilbake til alle feil
+    pastIncidents: Tidligere feil
+    pastIncidentsResolved: Rettet etter $MINUTES minutter, $POSTS oppdateringer
+    liveStatus: Status nå
+    overallUptime: "Oppetid: $UPTIME"
+    overallUptimeTitle: Oppetid
+    averageResponseTime: "Snitt svartid: $TIMEms"
+    averageResponseTimeTitle: Snitt svartid
+    sevelDayResponseTime: Svartid siste 7 dager
+    responseTimeMs: Svartid (ms)
+    up: Oppe
+    down: Nede
+    degraded: Treg
+    ms: ms
+    loading: Laster
+    navGitHub: GitHub
+    footer: Statussiden er [åpen kildekode]($REPO), laget med [Upptime](https://upptime.js.org)
+    rateLimitExceededTitle: For mange forespørsler
+    rateLimitExceededIntro: Du har brukt opp antallet forespørsler mot GitHub denne timen. Prøv igjen litt senere.
+    rateLimitExceededWhatDoesErrorMean: Hva betyr dette?
+    rateLimitExceededErrorMeaning: Statussiden henter sanntidsdata fra GitHub, og GitHub tillater 60 forespørsler i timen per IP-adresse.
+    rateLimitExceededErrorHowCanFix: Hva kan jeg gjøre?
+    rateLimitExceededErrorFix: Vent en time, så er grensen nullstilt.
+    rateLimitExceededGeneratePAT: Slik lager du et GitHub-token
+    rateLimitExceededHasSet: Du har lagt inn et token.
+    rateLimitExceededRemoveToken: Fjern token
+    rateLimitExceededGitHubPAT: GitHub-token
+    rateLimitExceededCopyPastePAT: Lim inn tokenet ditt
+    rateLimitExceededSaveToken: Lagre token
+    errorTitle: Noe gikk galt
+    errorIntro: Vi fikk ikke hentet siste status.
+    errorText: Prøv igjen om litt.
+    errorHome: Til forsiden
+    pastScheduledMaintenance: Tidligere planlagt vedlikehold
+    scheduledMaintenance: Planlagt vedlikehold
+    scheduledMaintenanceSummaryStarted: Startet $DATE, varer $DURATION minutter
+    scheduledMaintenanceSummaryStarts: Starter $DATE, varer $DURATION minutter
+    startedAt: Startet
+    startsAt: Starter
+    duration: Varighet
+    durationMin: $DURATION minutter
+    incidentCompleted: Ferdig
+    incidentScheduled: Planlagt
+    duration24H: 24 t
+    duration7D: 7 d
+    duration30D: 30 d
+    duration1Y: 1 år
+    durationAll: alt
+    locale: nb-NO
