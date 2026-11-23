@@ -43,6 +43,7 @@ Upptimes mal er **ikke** brukt direkte. Workflowene i `.github/workflows/` er sk
 | `summary.yml`       | daglig                          | Oversikten øverst i denne README-en                          |
 | `site.yml`          | daglig, og når `assets/` endres | Bygger statussiden og publiserer den til branchen `gh-pages` |
 | `setup.yml`         | når `.upptimerc.yml` endres     | Alt over på nytt                                             |
+| `dependabot-automerge.yml` | PR-er fra Dependabot   | Slår på automatisk merge for patch og minor av Actions       |
 
 Upptime committer rett til `main` med appens token, så appen må stå i unntakslisten (bypass) i regelsettet for `main`.
 
