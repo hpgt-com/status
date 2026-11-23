@@ -46,11 +46,19 @@ Upptimes mal er **ikke** brukt direkte. Workflowene i `.github/workflows/` er sk
 
 Upptime committer rett til `main` med appens token, så appen må stå i unntakslisten (bypass) i regelsettet for `main`.
 
-## Oppsett (gjort én gang)
+## Oppsett utenfor repoet
 
 - GitHub Pages: Settings → Pages → _Deploy from a branch_ → `gh-pages` / `(root)`, egendefinert domene
   `status.hpgt.com`, _Enforce HTTPS_.
 - Cloudflare DNS: `status` CNAME `hpgt-com.github.io` (DNS only, grå sky). Domenet er bekreftet for GitHub Pages i org-en.
+
+## Avvik fra retningslinjene
+
+| Regel | Avvik | Grunn |
+|---|---|---|
+| `persist-credentials: false` på `actions/checkout` | Jobbene som committer resultater, beholder appens token i checkouten (`zizmor: ignore[artipacked]`). | Upptime pusher selv. Tokenet varer én time og gjelder bare dette repoet. |
+| Pull request for alle endringer i `main` | Appen «HPGT Status» står i unntakslisten i regelsettet. | Upptime committer resultatene hvert 5. minutt. Appen har bare Contents og Issues. |
+| Sikkerhetshoder | status.hpgt.com har ikke CSP eller de andre hodene. | GitHub Pages kan ikke sette hoder. Siden er statisk, uten skjemaer, informasjonskapsler eller skript fra tredjeparter. |
 
 ## Sikkerhet
 
